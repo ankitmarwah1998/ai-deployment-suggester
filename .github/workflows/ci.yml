@@ -16,18 +16,19 @@ jobs:
         run: |
           echo "Applied patch to logging; no downtime; all tests passed" > logs.txt
 
-      - name: Send logs to AI Flask API
-        id: suggest
-        run: |
-          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app \
-            -H "Content-Type: application/json" \
-            -d '{
-              "logs": "Applied patch to logging; no downtime expected.",
-              "test_results": {"passed": true}
-            }' | jq -r .suggestion)
-          echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
-          echo "$suggestion" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+             - name: Send logs to AI Flask API
+            id: suggest
+            run: |
+              suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
+                -H "Content-Type: application/json" \
+                -d '{
+                  "logs": "Applied patch to logging; no downtime expected.",
+                  "test_results": {"passed": true}
+                }' | jq -r .suggestion)
+          
+              echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
+              echo "$suggestion" >> $GITHUB_ENV
+              echo "EOF" >> $GITHUB_ENV
 
       - name: Send Google Chat Notification
         run: |
