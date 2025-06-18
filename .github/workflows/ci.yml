@@ -16,9 +16,9 @@ jobs:
         run: |
           echo "Applied patch to logging; no downtime; all tests passed" > logs.txt
             
-      - name: Get AI Suggestion
-        id: suggest
-        run: |
+          - name: Get AI Suggestion
+            id: suggest
+            run: |
           suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
             -H "Content-Type: application/json" \
             -d '{
@@ -29,6 +29,14 @@ jobs:
           echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
           echo "$suggestion" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+      - name: Send Google Chat Notification
+        run: |
+          curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "text": "'"🚀 AI Deployment Suggestion: ${{ env.AI_SUGGESTION }}"'"
+            }'
 
 
 
