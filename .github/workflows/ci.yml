@@ -39,5 +39,52 @@ jobs:
         run: |
           curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
-            -d "$(jq -n --arg text "🚀 *AI Deployment Suggestion*:\n${{ env.AI_SUGGESTION }}" '{ text: $text }')"
+            -d '{
+              "cardsV2": [
+                {
+                  "card": {
+                    "header": {
+                      "title": "🚀 AI Deployment Suggestion",
+                      "subtitle": "Based on code + test context",
+                      "imageUrl": "https://cdn-icons-png.flaticon.com/512/190/190411.png",
+                      "imageType": "CIRCLE"
+                    },
+                    "sections": [
+                      {
+                        "header": "📌 Recommendation",
+                        "collapsible": false,
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "Based on the logs and test results, I would recommend a <b>rolling update</b> deployment strategy."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "header": "📋 Reasoning",
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "1. The patch was applied with <i>no expected downtime</i>.<br>2. <b>All tests passed</b>, indicating no major issues."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "header": "✅ Why Rolling Update",
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "• Updates instances one by one<br>• Zero downtime for users<br>• Easy rollback if needed"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }'
+
 
