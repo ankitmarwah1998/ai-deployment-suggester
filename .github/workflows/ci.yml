@@ -2,37 +2,39 @@ name: AI Deployment Suggestion
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+  pull_request:
 
 jobs:
-  suggest:
+  ai_suggest:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Get AI Suggestion from Flask API
+      - name: Send logs + metadata to AI Flask API
         id: suggest
         run: |
-          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
+          suggestion=$(curl -s -X POST https://your-ngrok-url.ngrok-free.app/suggest \
             -H "Content-Type: application/json" \
             -d '{
-              "logs": "Applied patch to logging; no downtime expected.",
-              "test_results": {"passed": true}
+              "logs": "Added payment service, no downtime expected.",
+              "test_results": {"passed": true},
+              "app_type": "api",
+              "cost_sensitivity": "high",
+              "traffic_pattern": "high",
+              "zero_downtime_required": true
             }' | jq -r .suggestion)
 
           echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
           echo "$suggestion" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Debug - Print AI Suggestion
-        run: echo "${{ env.AI_SUGGESTION }}"
-
       - name: Send Google Chat Notification
         run: |
           curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
             -d '{
-              "text": "'"🚀 *AI Deployment Suggestion:* ${{ env.AI_SUGGESTION }}"'"
+              "text": "🚀 *AI Deployment Suggestion:*\n${{ env.AI_SUGGESTION }}"
             }'
+
