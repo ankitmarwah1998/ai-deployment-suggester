@@ -31,11 +31,10 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
 
-      - name: Send Google Chat Notification
-        run: |
-          curl -X POST ${{ secrets.GCHAT_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d '{
-              "text": "🚀 *AI Deployment Suggestion:* '"${{ env.AI_SUGGESTION }}"'"
-            }'
-
+           - name: Send Google Chat Notification
+            run: |
+              curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
+                -H "Content-Type: application/json" \
+                -d '{
+                  "text": "'"🚀 AI Deployment Suggestion: ${{ env.AI_SUGGESTION }}"'"
+                }'
