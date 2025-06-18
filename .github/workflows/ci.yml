@@ -8,9 +8,14 @@ on:
 jobs:
   ai_suggest:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Simulate Test Results
+        run: |
+          echo "Applied patch to logging; no downtime; all tests passed" > logs.txt
 
       - name: Send logs + metadata to AI Flask API
         id: suggest
@@ -18,7 +23,7 @@ jobs:
           suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
             -H "Content-Type: application/json" \
             -d '{
-              "logs": "Added payment service, no downtime expected.",
+              "logs": "Applied patch to logging; no downtime expected.",
               "test_results": {"passed": true},
               "app_type": "api",
               "cost_sensitivity": "high",
@@ -34,7 +39,5 @@ jobs:
         run: |
           curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "text": "🚀 *AI Deployment Suggestion:*\n${{ env.AI_SUGGESTION }}"
-            }'
+            -d "$(jq -n --arg text "🚀 *AI Deployment Suggestion*:\n${{ env.AI_SUGGESTION }}" '{ text: $text }')"
 
