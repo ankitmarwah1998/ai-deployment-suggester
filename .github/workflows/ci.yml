@@ -1,0 +1,41 @@
+name: AI Deployment Suggestion
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  ai_suggest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Simulate Test Results
+        run: |
+          echo "Applied patch to logging; no downtime; all tests passed" > logs.txt
+
+      - name: Send logs to AI Flask API
+        id: suggest
+        run: |
+          suggestion=$(curl -s -X POST https://abc123.ngrok.io/suggest \
+            -H "Content-Type: application/json" \
+            -d '{
+              "logs": "Applied patch to logging; no downtime expected.",
+              "test_results": {"passed": true}
+            }' | jq -r .suggestion)
+          echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
+          echo "$suggestion" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "*🚀 Deployment Suggestion:* ${{ env.AI_SUGGESTION }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+

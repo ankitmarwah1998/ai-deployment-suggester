@@ -1,0 +1,9 @@
+You are a DevOps expert. Based on the following logs and test results,
+suggest the best deployment strategy (e.g. blue-green, canary, rolling, feature flag) with a brief explanation.
+
+Logs:
+{logs}
+
+Test Results:
+{test_results}
+
