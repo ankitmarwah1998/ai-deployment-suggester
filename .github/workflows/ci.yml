@@ -15,7 +15,7 @@ jobs:
       - name: Send logs + metadata to AI Flask API
         id: suggest
         run: |
-          suggestion=$(curl -s -X POST https://your-ngrok-url.ngrok-free.app/suggest \
+          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
             -H "Content-Type: application/json" \
             -d '{
               "logs": "Added payment service, no downtime expected.",
