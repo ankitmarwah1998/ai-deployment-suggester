@@ -48,11 +48,30 @@ jobs:
         run: |
           curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "cardsV2": [
+            -d "{
+              \"cardsV2\": [
                 {
-                  "card": {
-                    "header": {
-                      "title": "🚀 AI Deployment Suggestion",
-                      "subtitle": "Based on latest code commit",
+                  \"card\": {
+                    \"header\": {
+                      \"title\": \"🚀 AI Deployment Suggestion\",
+                      \"subtitle\": \"Based on latest code commit\",
+                      \"imageUrl\": \"https://cdn-icons-png.flaticon.com/512/190/190411.png\",
+                      \"imageType\": \"CIRCLE\"
+                    },
+                    \"sections\": [
+                      {
+                        \"header\": \"📌 Recommendation\",
+                        \"widgets\": [
+                          {
+                            \"textParagraph\": {
+                              \"text\": \"${{ env.AI_SUGGESTION }}\"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }"
 
