@@ -8,9 +8,18 @@ def suggest():
     data = request.json
     logs = data.get("logs", "")
     test_results = data.get("test_results", {})
-    suggestion = get_suggestion(logs, test_results)
-    return jsonify({"suggestion": suggestion})
+    app_type = data.get("app_type", "web")
+    cost = data.get("cost_sensitivity", "medium")
+    traffic = data.get("traffic_pattern", "low")
+    zero_downtime = data.get("zero_downtime_required", False)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    suggestion = get_suggestion(
+        logs=logs,
+        test_results=test_results,
+        app_type=app_type,
+        cost=cost,
+        traffic=traffic,
+        zero_downtime=zero_downtime
+    )
+    return jsonify({"suggestion": suggestion})
 

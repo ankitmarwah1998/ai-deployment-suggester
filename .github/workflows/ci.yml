@@ -23,6 +23,7 @@ jobs:
       - name: Send logs + metadata to AI Flask API
         id: suggest
         run: |
+<<<<<<< HEAD
           PATCH_CONTENT=$(cat patch.txt | jq -Rs .)
           COMMIT_MSG=$(cat commit_info.txt | jq -Rs .)
           FILES=$(cat files_changed.txt | jq -Rs .)
@@ -39,6 +40,18 @@ jobs:
               \"traffic_pattern\": \"high\",
               \"zero_downtime_required\": true
             }" | jq -r .suggestion)
+=======
+          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
+            -H "Content-Type: application/json" \
+            -d '{
+              "logs": "Applied patch to logging; no downtime expected.",
+              "test_results": {"passed": true},
+              "app_type": "api",
+              "cost_sensitivity": "high",
+              "traffic_pattern": "high",
+              "zero_downtime_required": true
+            }' | jq -r .suggestion)
+>>>>>>> 95e4d276ba155bbc84c30c3a966784313d49847e
 
           echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
           echo "$suggestion" >> $GITHUB_ENV
@@ -54,17 +67,49 @@ jobs:
                   "card": {
                     "header": {
                       "title": "🚀 AI Deployment Suggestion",
+<<<<<<< HEAD
                       "subtitle": "Based on latest code commit",
+=======
+                      "subtitle": "Based on code + test context",
+>>>>>>> 95e4d276ba155bbc84c30c3a966784313d49847e
                       "imageUrl": "https://cdn-icons-png.flaticon.com/512/190/190411.png",
                       "imageType": "CIRCLE"
                     },
                     "sections": [
                       {
                         "header": "📌 Recommendation",
+<<<<<<< HEAD
                         "widgets": [
                           {
                             "textParagraph": {
                               "text": "'"${{ env.AI_SUGGESTION }}"'"
+=======
+                        "collapsible": false,
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "Based on the logs and test results, I would recommend a <b>rolling update</b> deployment strategy."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "header": "📋 Reasoning",
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "1. The patch was applied with <i>no expected downtime</i>.<br>2. <b>All tests passed</b>, indicating no major issues."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "header": "✅ Why Rolling Update",
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "• Updates instances one by one<br>• Zero downtime for users<br>• Easy rollback if needed"
+>>>>>>> 95e4d276ba155bbc84c30c3a966784313d49847e
                             }
                           }
                         ]
@@ -76,5 +121,8 @@ jobs:
             }'
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 95e4d276ba155bbc84c30c3a966784313d49847e
