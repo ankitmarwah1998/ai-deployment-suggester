@@ -27,7 +27,7 @@ jobs:
           COMMIT_MSG=$(cat commit_info.txt | jq -Rs .)
           FILES=$(cat files_changed.txt | jq -Rs .)
 
-          suggestion=$(curl -s -X POST http://localhost:5001/suggest \
+          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
             -H "Content-Type: application/json" \
             -d "{
               \"logs\": $PATCH_CONTENT,
