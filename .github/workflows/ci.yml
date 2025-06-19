@@ -8,32 +8,73 @@ on:
 jobs:
   ai_suggest:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Simulate Test Results
+      - name: Get Git Diff (Latest Commit)
+        id: diff
         run: |
-          echo "Applied patch to logging; no downtime; all tests passed" > logs.txt
+          git log -1 --pretty=format:"%h - %s" > commit_info.txt
+          git show --pretty="" --name-only > files_changed.txt
+          git show > patch.txt
 
-      - name: Send logs to AI Flask API
+      - name: Send logs + metadata to AI Flask API
         id: suggest
         run: |
-          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app \
+          PATCH_CONTENT=$(cat patch.txt | jq -Rs .)
+          COMMIT_MSG=$(cat commit_info.txt | jq -Rs .)
+          FILES=$(cat files_changed.txt | jq -Rs .)
+
+          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
             -H "Content-Type: application/json" \
-            -d '{
-              "logs": "Applied patch to logging; no downtime expected.",
-              "test_results": {"passed": true}
-            }' | jq -r .suggestion)
+            -d "{
+              \"logs\": $PATCH_CONTENT,
+              \"commit_message\": $COMMIT_MSG,
+              \"files_changed\": $FILES,
+              \"test_results\": {\"passed\": true},
+              \"app_type\": \"api\",
+              \"cost_sensitivity\": \"high\",
+              \"traffic_pattern\": \"high\",
+              \"zero_downtime_required\": true
+            }" | jq -r .suggestion)
+
           echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
           echo "$suggestion" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Send Google Chat Notification
         run: |
-          curl -X POST ${{ secrets.GCHAT_WEBHOOK_URL }} \
+          curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
             -d '{
-              "text": "🚀 *AI Deployment Suggestion:* '"${{ env.AI_SUGGESTION }}"'"
+              "cardsV2": [
+                {
+                  "card": {
+                    "header": {
+                      "title": "🚀 AI Deployment Suggestion",
+                      "subtitle": "Based on latest code commit",
+                      "imageUrl": "https://cdn-icons-png.flaticon.com/512/190/190411.png",
+                      "imageType": "CIRCLE"
+                    },
+                    "sections": [
+                      {
+                        "header": "📌 Recommendation",
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text": "'"${{ env.AI_SUGGESTION }}"'"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }'
+
+
+
 
