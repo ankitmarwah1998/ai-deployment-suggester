@@ -27,7 +27,7 @@ jobs:
           COMMIT_MSG=$(cat commit_info.txt | jq -Rs .)
           FILES=$(cat files_changed.txt | jq -Rs .)
 
-          suggestion=$(curl -s -X POST https://33b9-115-112-99-50.ngrok-free.app/suggest \
+          suggestion=$(curl -s -X POST http://localhost:5001/suggest \
             -H "Content-Type: application/json" \
             -d "{
               \"logs\": $PATCH_CONTENT,
@@ -41,12 +41,13 @@ jobs:
             }" | jq -r .suggestion)
 
           echo "AI_SUGGESTION<<EOF" >> $GITHUB_ENV
-          echo \"$suggestion\" >> $GITHUB_ENV
+          echo "$suggestion" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Send Google Chat Notification
         run: |
-          curl -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
+          ESCAPED=$(echo "${{ env.AI_SUGGESTION }}" | jq -Rs .)
+          curl -L -X POST "${{ secrets.GCHAT_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
             -d "{
               \"cardsV2\": [
@@ -64,7 +65,7 @@ jobs:
                         \"widgets\": [
                           {
                             \"textParagraph\": {
-                              \"text\": \"${{ env.AI_SUGGESTION }}\"
+                              \"text\": $ESCAPED
                             }
                           }
                         ]
